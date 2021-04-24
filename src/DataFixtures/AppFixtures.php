@@ -23,7 +23,7 @@ class AppFixtures extends Fixture
         $user->setEmail('user@yandex.ru');
         $user->setPassword($this->passwordEncoder->encodePassword(
             $user,
-            'user'
+            'user123'
         ));
         $user->setRoles(["ROLE_USER"]);
         $user->setBalance(0);
@@ -34,7 +34,7 @@ class AppFixtures extends Fixture
         $user->setEmail('admin@yandex.ru');
         $user->setPassword($this->passwordEncoder->encodePassword(
             $user,
-            'admin'
+            'admin123'
         ));
         $user->setRoles(["ROLE_SUPER_ADMIN"]);
         $user->setBalance(0);

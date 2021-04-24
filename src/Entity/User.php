@@ -5,15 +5,25 @@ namespace App\Entity;
 use App\Model\UserDTO;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * @OA\Schema(
+ *     title="User",
+ *     description="User"
+ * )
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="billing_user")
  */
 class User implements UserInterface
 {
     /**
+     * @OA\Property(
+     *     format="int64",
+     *     title="Id",
+     *     description="Id"
+     * )
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -21,22 +31,42 @@ class User implements UserInterface
     private $id;
 
     /**
+     * @OA\Property(
+     *     format="email",
+     *     title="Email",
+     *     description="Email"
+     * )
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
 
     /**
+     * @OA\Property(
+     *     format="array",
+     *     title="Roles",
+     *     description="Roles"
+     * )
      * @ORM\Column(type="json")
      */
     private $roles = [];
 
     /**
+     * @OA\Property(
+     *     format="string",
+     *     title="Password",
+     *     description="Password"
+     * )
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
     private $password;
 
     /**
+     * @OA\Property(
+     *     format="float",
+     *     title="Balance",
+     *     description="Balance"
+     * )
      * @ORM\Column(type="float")
      */
     private $balance;
@@ -122,12 +152,13 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    public static function fromDto(UserDTO $userDTO): self
+    public static function fromDTO(UserDTO $userDTO): self
     {
         $user = new self();
         $user->setEmail($userDTO->getEmail());
         $user->setRoles(["ROLE_USER"]);
-        $user->setPassword($userDTO->getPassword);
+        $user->setPassword($userDTO->getPassword());
+        $user->setBalance(0);
         return $user;
     }
 
