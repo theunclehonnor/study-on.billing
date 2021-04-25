@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Model\UserDTO;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -42,7 +43,10 @@ class User implements UserInterface
 
     /**
      * @OA\Property(
-     *     format="array",
+     *     type="array",
+     *     @OA\Items(
+     *         type="string"
+     *     ),
      *     title="Roles",
      *     description="Roles"
      * )
@@ -52,7 +56,7 @@ class User implements UserInterface
 
     /**
      * @OA\Property(
-     *     format="string",
+     *     type="string",
      *     title="Password",
      *     description="Password"
      * )
@@ -63,7 +67,7 @@ class User implements UserInterface
 
     /**
      * @OA\Property(
-     *     format="float",
+     *     type="float",
      *     title="Balance",
      *     description="Balance"
      * )

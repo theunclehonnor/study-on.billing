@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     /**
-     * @OA\Post(
+     * @OA\Get (
      *     path="/api/v1/users/current",
      *     tags={"User"},
      *     summary="Информация о пользователе",
@@ -40,7 +40,7 @@ class UserController extends AbstractController
      *              @OA\Property(
      *                  property="balance",
      *                  type="number",
-     *                  format="float"
+     *                  type="float"
      *              ),
      *          )
      *     ),
@@ -61,7 +61,8 @@ class UserController extends AbstractController
      *          )
      *     )
      * )
-     * @Route("/current", name="current_user", methods={"POST"})
+     *
+     * @Route("/current", name="current_user", methods={"GET"})
      * @param SerializerInterface $serializer
      * @return Response
      */

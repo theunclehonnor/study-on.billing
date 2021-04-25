@@ -85,7 +85,18 @@ class AuthController extends AbstractController
      *     operationId="register",
      *     @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/UserDTO")
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="email",
+     *                  type="string",
+     *                  example="user@yandex.ru"
+     *              ),
+     *              @OA\Property(
+     *                  property="password",
+     *                  type="string",
+     *                  example="user123"
+     *              )
+     *          )
      *     ),
      *     @OA\Response(
      *          response="201",

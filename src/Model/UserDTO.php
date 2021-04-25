@@ -20,10 +20,19 @@ class UserDTO
 {
     /**
      * @OA\Property(
+     *     type="string",
+     *     title="Username",
+     *     description="Username"
+     * )
+     * @Serializer\Type("string")
+     */
+    private $username;
+
+    /**
+     * @OA\Property(
      *     format="email",
      *     title="Email",
-     *     description="Email",
-     *     example="test@yandex.ru"
+     *     description="Email"
      * )
      * @Serializer\Type("string")
      * @Assert\Email(message="Email address {{ value }} is not valid")
@@ -32,10 +41,9 @@ class UserDTO
 
     /**
      * @OA\Property(
-     *     format="string",
+     *     type="string",
      *     title="Password",
-     *     description="Password",
-     *     example="test123"
+     *     description="Password"
      * )
      * @Serializer\Type("string")
      * @Assert\Length(
@@ -47,34 +55,76 @@ class UserDTO
     private $password;
 
     /**
-     * @return mixed
+     * @OA\Property(
+     *     type="array",
+     *     @OA\Items(
+     *         type="string"
+     *     ),
+     *     title="Roles",
+     *     description="Roles"
+     * )
+     * @Serializer\Type("array")
      */
+    private $roles = [];
+
+    /**
+     * @OA\Property(
+     *     type="float",
+     *     title="Balance",
+     *     description="Balance"
+     * )
+     * @Serializer\Type("float")
+     */
+    private $balance;
+
     public function getEmail()
     {
         return $this->email;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPassword()
     {
         return $this->password;
     }
 
-    /**
-     * @param mixed $email
-     */
     public function setEmail($email): void
     {
         $this->email = $email;
     }
 
-    /**
-     * @param mixed $password
-     */
     public function setPassword($password): void
     {
         $this->password = $password;
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+    public function getBalance()
+    {
+        return $this->balance;
+    }
+
+    public function setBalance(float $balance): void
+    {
+        $this->balance = $balance;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+        $this->email = $username;
     }
 }
