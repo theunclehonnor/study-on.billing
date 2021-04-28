@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tests;
 
 use App\DataFixtures\AppFixtures;
@@ -30,9 +29,10 @@ class AuthControllerTest extends AbstractTest
         $this->serializer = self::$kernel->getContainer()->get('jms_serializer');
     }
 
-    // Тест успешного входа в систему
-    public function testAuthSuccessful(): void
+    // Тесты авторизации в системе
+    public function testAuth(): void
     {
+        //_____________Проверка успешной авторизации_____________
         // Авторизируемся существующим пользователем
         $user = [
             'username' => 'user@yandex.ru',
@@ -43,10 +43,10 @@ class AuthControllerTest extends AbstractTest
         $client = self::getClient();
         $client->request(
             'POST',
-            $this->startingPath . '/auth',
+            $this->startingPath.'/auth',
             [],
             [],
-            [ 'CONTENT_TYPE' => 'application/json' ],
+            ['CONTENT_TYPE' => 'application/json'],
             $this->serializer->serialize($user, 'json')
         );
 
@@ -62,11 +62,8 @@ class AuthControllerTest extends AbstractTest
         // Проверка содержимого ответа (token)
         $json = json_decode($client->getResponse()->getContent(), true);
         self::assertNotEmpty($json['token']);
-    }
 
-    // Тест неуспешного входа в систему
-    public function testAuthUnsuccessful(): void
-    {
+        //_____________Проверка неуспешной авторизации_____________
         // Авторизируемся существующим пользователем, но не с верным паролем
         $user = [
             'username' => 'user@yandex.ru',
@@ -77,10 +74,10 @@ class AuthControllerTest extends AbstractTest
         $client = self::getClient();
         $client->request(
             'POST',
-            $this->startingPath . '/auth',
+            $this->startingPath.'/auth',
             [],
             [],
-            [ 'CONTENT_TYPE' => 'application/json' ],
+            ['CONTENT_TYPE' => 'application/json'],
             $this->serializer->serialize($user, 'json')
         );
 
@@ -111,10 +108,10 @@ class AuthControllerTest extends AbstractTest
         $client = self::getClient();
         $client->request(
             'POST',
-            $this->startingPath . '/register',
+            $this->startingPath.'/register',
             [],
             [],
-            [ 'CONTENT_TYPE' => 'application/json' ],
+            ['CONTENT_TYPE' => 'application/json'],
             $this->serializer->serialize($user, 'json')
         );
 
@@ -146,10 +143,10 @@ class AuthControllerTest extends AbstractTest
         $client = self::getClient();
         $client->request(
             'POST',
-            $this->startingPath . '/register',
+            $this->startingPath.'/register',
             [],
             [],
-            [ 'CONTENT_TYPE' => 'application/json' ],
+            ['CONTENT_TYPE' => 'application/json'],
             $this->serializer->serialize($user, 'json')
         );
 
@@ -177,10 +174,10 @@ class AuthControllerTest extends AbstractTest
         $client = self::getClient();
         $client->request(
             'POST',
-            $this->startingPath . '/register',
+            $this->startingPath.'/register',
             [],
             [],
-            [ 'CONTENT_TYPE' => 'application/json' ],
+            ['CONTENT_TYPE' => 'application/json'],
             $this->serializer->serialize($user, 'json')
         );
 

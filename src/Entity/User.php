@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Model\UserDTO;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Security\Core\User\UserInterface;
 

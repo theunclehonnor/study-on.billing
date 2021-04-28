@@ -1,13 +1,12 @@
 <?php
 
-
 namespace App\Controller;
 
 use App\Entity\User;
 use App\Model\UserDTO;
 use JMS\Serializer\SerializerInterface;
-use OpenApi\Annotations as OA;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -137,12 +136,6 @@ class AuthController extends AbstractController
      *     )
      * )
      * @Route("/register", name="register", methods={"POST"})
-     * @param Request $request
-     * @param SerializerInterface $serializer
-     * @param ValidatorInterface $validator
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param JWTTokenManagerInterface $JWTManager
-     * @return Response
      */
     public function register(
         Request $request,
@@ -168,6 +161,7 @@ class AuthController extends AbstractController
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response->setContent($serializer->serialize($data, 'json'));
             $response->headers->add(['Content-Type' => 'application/json']);
+
             return $response;
         }
         // Существует ли данный пользовательн в системе
@@ -199,6 +193,7 @@ class AuthController extends AbstractController
         }
         $response->setContent($serializer->serialize($data, 'json'));
         $response->headers->add(['Content-Type' => 'application/json']);
+
         return $response;
     }
 }

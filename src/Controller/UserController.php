@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Controller;
 
 use App\Entity\User;
@@ -63,8 +62,6 @@ class UserController extends AbstractController
      * )
      *
      * @Route("/current", name="current_user", methods={"GET"})
-     * @param SerializerInterface $serializer
-     * @return Response
      */
     public function current(SerializerInterface $serializer): Response
     {
@@ -89,12 +86,13 @@ class UserController extends AbstractController
             $data = [
                 'username' => $user->getEmail(),
                 'roles' => $user->getRoles(),
-                'balance' => $user->getBalance()
+                'balance' => $user->getBalance(),
             ];
             $response->setStatusCode(Response::HTTP_OK);
         }
         $response->setContent($serializer->serialize($data, 'json'));
         $response->headers->add(['Content-Type' => 'application/json']);
+
         return $response;
     }
 }

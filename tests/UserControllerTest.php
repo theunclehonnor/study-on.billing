@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tests;
 
 use App\DataFixtures\AppFixtures;
@@ -46,10 +45,10 @@ class UserControllerTest extends AbstractTest
         $client = self::getClient();
         $client->request(
             'POST',
-            $this->startingPath . '/auth',
+            $this->startingPath.'/auth',
             [],
             [],
-            [ 'CONTENT_TYPE' => 'application/json' ],
+            ['CONTENT_TYPE' => 'application/json'],
             $this->serializer->serialize($user, 'json')
         );
         $json = json_decode($client->getResponse()->getContent(), true);
@@ -59,13 +58,13 @@ class UserControllerTest extends AbstractTest
         //_____________Проверка успешной операции получения данных_____________
         // Формирование верного запроса
         $contentHeaders = [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+            'HTTP_AUTHORIZATION' => 'Bearer '.$token,
             'CONTENT_TYPE' => 'application/json',
         ];
 
         $client->request(
             'GET',
-            $this->startingPath . '/users/current',
+            $this->startingPath.'/users/current',
             [],
             [],
             $contentHeaders
@@ -94,13 +93,13 @@ class UserControllerTest extends AbstractTest
         $token = 'шишль мышль';
         // Передаем неверный токен
         $contentHeaders = [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
+            'HTTP_AUTHORIZATION' => 'Bearer '.$token,
             'CONTENT_TYPE' => 'application/json',
         ];
 
         $client->request(
             'GET',
-            $this->startingPath . '/users/current',
+            $this->startingPath.'/users/current',
             [],
             [],
             $contentHeaders
