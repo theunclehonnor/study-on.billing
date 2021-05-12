@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Model\UserDTO;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
+use Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken;
 use JMS\Serializer\SerializerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use OpenApi\Annotations as OA;
@@ -48,7 +50,11 @@ class AuthController extends AbstractController
      *              @OA\Property(
      *                  property="token",
      *                  type="string"
-     *              )
+     *              ),
+     *              @OA\Property(
+     *                  property="refresh_token",
+     *                  type="string"
+     *              ),
      *          )
      *     ),
      *     @OA\Response(
@@ -142,7 +148,8 @@ class AuthController extends AbstractController
         SerializerInterface $serializer,
         ValidatorInterface $validator,
         UserPasswordEncoderInterface $passwordEncoder,
-        JWTTokenManagerInterface $JWTManager
+        JWTTokenManagerInterface $JWTManager,
+        RefreshTokenManagerInterface $refreshTokenManager
     ): Response {
         // Десериализация
         $userDTO = $serializer->deserialize($request->getContent(), UserDTO::class, 'json');
@@ -184,9 +191,17 @@ class AuthController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
+            // Token обновления
+            $refreshToken = $refreshTokenManager->create();
+            $refreshToken->setUsername($user->getEmail());
+            $refreshToken->setRefreshToken();
+            $refreshToken->setValid((new \DateTime())->modify('+1 month'));
+            $refreshTokenManager->save($refreshToken);
+
             $data = [
                 // JWT token
                 'token' => $JWTManager->create($user),
+                'refresh_token' => $refreshToken->getRefreshToken(),
             ];
             // Устанавливаем статус ответа
             $response->setStatusCode(Response::HTTP_CREATED);
@@ -195,5 +210,62 @@ class AuthController extends AbstractController
         $response->headers->add(['Content-Type' => 'application/json']);
 
         return $response;
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/token/refresh",
+     *     tags={"User"},
+     *     summary="Refresh token",
+     *     operationId="token.refresh",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="refresh_token",
+     *                  type="string"
+     *              )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Обновление токена успешно завершено",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="token",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="refresh_token",
+     *                  type="string"
+     *              )
+     *          )
+     *     ),
+     *     @OA\Response(
+     *          response="401",
+     *          description="Не удалось обновить токен",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="code",
+     *                  type="integer",
+     *                  example="401"
+     *              ),
+     *              @OA\Property(
+     *                  property="message",
+     *                  type="string",
+     *                  example="Произошла ошибка при обновлении токена"
+     *              )
+     *          )
+     *     )
+     * )
+     *
+     * @Route("/token/refresh", name="refresh", methods={"POST"})
+     * @param Request $request
+     * @param RefreshToken $refreshService
+     * @return mixed
+     */
+    public function refresh(Request $request, RefreshToken $refreshService)
+    {
+        return $refreshService->refresh($request);
     }
 }

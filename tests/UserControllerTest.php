@@ -5,6 +5,7 @@ namespace App\Tests;
 use App\DataFixtures\AppFixtures;
 use App\Entity\User;
 use App\Model\UserDTO;
+use App\Service\PaymentService;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,7 +23,12 @@ class UserControllerTest extends AbstractTest
 
     public function getFixtures(): array
     {
-        return [new AppFixtures(self::$kernel->getContainer()->get('security.password_encoder'))];
+        return [
+            new AppFixtures(
+                self::$kernel->getContainer()->get('security.password_encoder'),
+                self::$kernel->getContainer()->get(PaymentService::class)
+            ),
+            ];
     }
 
     protected function setUp(): void
@@ -31,31 +37,39 @@ class UserControllerTest extends AbstractTest
         $this->serializer = self::$kernel->getContainer()->get('jms_serializer');
     }
 
+    public function auth($user): array
+    {
+        // Создание запроса
+        $client = self::getClient();
+        $client->request(
+            'POST',
+            '/api/v1/auth',
+            [],
+            [],
+            [ 'CONTENT_TYPE' => 'application/json' ],
+            $this->serializer->serialize($user, 'json')
+        );
+
+
+        // Проверка содержимого ответа (В ответе должен быть представлен token)
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    // Тест получении данных о пользователе
     public function testCurrent(): void
     {
-        $client = self::getClient();
-
-        // Авторизируемся существующим пользователем
+        // Авторизация обычным пользователем
         $user = [
             'username' => 'user@yandex.ru',
             'password' => 'user123',
         ];
-
-        // Формируем запрос
-        $client = self::getClient();
-        $client->request(
-            'POST',
-            $this->startingPath.'/auth',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $this->serializer->serialize($user, 'json')
-        );
-        $json = json_decode($client->getResponse()->getContent(), true);
-        // Получаем токен клиента
-        $token = $json['token'];
+        $data = $this->auth($user);
+        // Получаем токен
+        $token = $data['token'];
+        self::assertNotEmpty($token);
 
         //_____________Проверка успешной операции получения данных_____________
+        $client = self::getClient();
         // Формирование верного запроса
         $contentHeaders = [
             'HTTP_AUTHORIZATION' => 'Bearer '.$token,

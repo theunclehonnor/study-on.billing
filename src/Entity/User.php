@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Model\UserDTO;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -73,6 +75,16 @@ class User implements UserInterface
      * @ORM\Column(type="float")
      */
     private $balance;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Transaction::class, mappedBy="userBilling", orphanRemoval=true)
+     */
+    private $transactions;
+
+    public function __construct()
+    {
+        $this->transactions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -173,6 +185,36 @@ class User implements UserInterface
     public function setBalance(float $balance): self
     {
         $this->balance = $balance;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setUserBilling($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getUserBilling() === $this) {
+                $transaction->setUserBilling(null);
+            }
+        }
 
         return $this;
     }
