@@ -131,23 +131,6 @@ class CourseControllerTest extends AbstractTest
         $response = json_decode($client->getResponse()->getContent(), true);
         self::assertEquals('rent', $response['type']);
 
-        //__________Проверка получения курса c неверным jwt токеном__________
-        $token = '123';
-        // Создание запроса на получения курса
-        $codeCourse = 'AREND199230SKLADS';
-        $client->request(
-            'GET',
-            $this->startingPath . '/' . $codeCourse,
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $token,
-            ]
-        );
-        // Проверка статуса ответа
-        $this->assertResponseCode(Response::HTTP_UNAUTHORIZED, $client->getResponse());
-
         //__________Проверка получения несуществующего курса__________
         // Создание запроса на получения курса
         $codeCourse = '333';

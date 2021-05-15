@@ -39,7 +39,7 @@ security:
             stateless: true
             anonymous: true
         course_show:
-            pattern: ^/api/v1/(courses)/[a-zA-Z\d]+$
+            pattern: ^/api/v1/(courses)/[A-Z\d]+$
             stateless: true
             anonymous: true
         api:
@@ -58,5 +58,5 @@ security:
         - { path: ^/api/v1/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/v1/doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/v1/courses$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/v1/(courses)/[a-zA-Z\d]+$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/(courses)/[A-Z\d]+$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }

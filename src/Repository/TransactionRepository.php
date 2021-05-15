@@ -30,6 +30,11 @@ class TransactionRepository extends ServiceEntityRepository
         Request $request,
         CourseRepository $courseRepository
     ): array {
+        $types = [
+            'payment' => 1,
+            'deposit' => 2,
+        ];
+
         $type = $request->query->get('type');
         $courseCode = $request->query->get('course_code');
         $skipExpired = $request->query->get('skip_expired');
@@ -40,7 +45,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->orderBy('t.createdAt', 'DESC');
 
         if ($type) {
-            $numberType = $type;
+            $numberType = $types[$type];
             $qb->andWhere('t.typeOperation = :type')
                 ->setParameter('type', $numberType);
         }

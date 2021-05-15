@@ -110,7 +110,11 @@ class AuthController extends AbstractController
      *              @OA\Property(
      *                  property="token",
      *                  type="string"
-     *              )
+     *              ),
+     *              @OA\Property(
+     *                  property="refresh_token",
+     *                  type="string"
+     *              ),
      *          )
      *     ),
      *     @OA\Response(
