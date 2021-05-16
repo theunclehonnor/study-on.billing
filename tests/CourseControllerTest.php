@@ -5,6 +5,8 @@ namespace App\Tests;
 
 use App\DataFixtures\AppFixtures;
 use App\DataFixtures\CourseFixtures;
+use App\Entity\Course;
+use App\Model\CourseDTO;
 use App\Service\PaymentService;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -216,5 +218,88 @@ class CourseControllerTest extends AbstractTest
         );
         // Проверка статуса ответа
         $this->assertResponseCode(Response::HTTP_UNAUTHORIZED, $client->getResponse());
+    }
+
+    // Тест создания нового курса
+    public function testNewCourse(): void
+    {
+        //__________Успешное добавления курса от имени администратора__________
+        // Авторизация
+        $user = [
+            'username' => 'admin@yandex.ru',
+            'password' => 'admin123',
+        ];
+        $userData = $this->auth($user);
+
+        $client = self::getClient();
+        // Создание запроса для добавления нового курса
+        $courseDTO = new CourseDTO('NEWCODECOURSE123', 'buy', 19000, 'Старт со 100$');
+        $dataRequest = $this->serializer->serialize($courseDTO, 'json');
+        $client->request(
+            'POST',
+            $this->startingPath . '/new',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $userData['token'],
+            ],
+            $dataRequest
+        );
+        // Проверка статуса ответа
+        $this->assertResponseCode(Response::HTTP_CREATED, $client->getResponse());
+
+        // Проверка содержимого ответа (успешное добавление)
+        $response = json_decode($client->getResponse()->getContent(), true);
+        self::assertEquals(true, $response['success']);
+
+        //__________Добавления уже имеющегося курса в системе от имени администратора__________
+        $client = self::getClient();
+        // Создание запроса для добавления нового курса уже имеющегося в системе
+        $courseDTO = new CourseDTO('MSALDLGSALDFJASLDDASODP', 'buy', 65000, 'Трейдер');
+        $dataRequest = $this->serializer->serialize($courseDTO, 'json');
+        $client->request(
+            'POST',
+            $this->startingPath . '/new',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $userData['token'],
+            ],
+            $dataRequest
+        );
+        // Проверка статуса ответа
+        $this->assertResponseCode(Response::HTTP_METHOD_NOT_ALLOWED, $client->getResponse());
+
+        // Проверка содержимого ответа (неуспешное добавление)
+        $response = json_decode($client->getResponse()->getContent(), true);
+        self::assertEquals($response['message'], 'Курс с данным кодом уже существует в системе');
+
+        //__________Добавления курса обычным пользователем (доступ запрещен)__________
+        // Авторизация
+        $user = [
+            'username' => 'user@yandex.ru',
+            'password' => 'user123',
+        ];
+        $userData = $this->auth($user);
+
+        $client = self::getClient();
+        // Создание запроса для добавления нового курса
+        $courseDTO = new CourseDTO('NEWCODECOURSE123', 'buy', 19000, 'Старт со 100$');
+        $dataRequest = $this->serializer->serialize($courseDTO, 'json');
+        $client->request(
+            'POST',
+            $this->startingPath . '/new',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $userData['token'],
+            ],
+            $dataRequest
+        );
+        // Проверка статуса ответа (запрещено)
+        $this->assertResponseCode(Response::HTTP_FORBIDDEN, $client->getResponse());
     }
 }

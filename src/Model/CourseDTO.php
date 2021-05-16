@@ -4,25 +4,58 @@
 namespace App\Model;
 
 use JMS\Serializer\Annotation as Serializer;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     title="CourseDTO",
+ *     description="CourseDTO"
+ * )
+ * Class CourseDTO
+ * @package App\Model
+ */
 class CourseDTO
 {
     /**
+     * @OA\Property(
+     *     format="string",
+     *     title="code",
+     *     description="Код курса",
+     *     example="MLSADKLD13213KSDMDNVM35"
+     * )
      * @Serializer\Type("string")
      */
     private $code;
 
     /**
+     * @OA\Property(
+     *     format="string",
+     *     title="type",
+     *     description="Тип курса",
+     *     example="buy"
+     * )
      * @Serializer\Type("string")
      */
     private $type;
 
     /**
+     * @OA\Property(
+     *     format="float",
+     *     title="price",
+     *     description="Стоимость курса",
+     *     example="15000"
+     * )
      * @Serializer\Type("float")
      */
     private $price;
 
     /**
+     * @OA\Property(
+     *     format="string",
+     *     title="title",
+     *     description="Название курса",
+     *     example="Основы рынка"
+     * )
      * @Serializer\Type("string")
      */
     private $title;

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\CourseDTO;
 use App\Repository\CourseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -139,6 +140,27 @@ class Course
                 $transaction->setCourse(null);
             }
         }
+
+        return $this;
+    }
+
+    public static function fromDtoNew(CourseDTO $courseDTO): self
+    {
+        $course = new self();
+        $course->setCode($courseDTO->getCode());
+        $course->setCourseType(array_search($courseDTO->getType(), self::TYPES_COURSE));
+        $course->setPrice($courseDTO->getPrice());
+        $course->setTitle($courseDTO->getTitle());
+
+        return $course;
+    }
+
+    public function fromDtoEdit(CourseDTO $courseDTO): self
+    {
+        $this->price = $courseDTO->getPrice();
+        $this->title = $courseDTO->getTitle();
+        $this->code = $courseDTO->getCode();
+        $this->courseType = array_search($courseDTO->getType(), self::TYPES_COURSE);
 
         return $this;
     }
