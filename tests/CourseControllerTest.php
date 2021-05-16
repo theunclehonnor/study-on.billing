@@ -276,7 +276,7 @@ class CourseControllerTest extends AbstractTest
         $response = json_decode($client->getResponse()->getContent(), true);
         self::assertEquals($response['message'], 'Курс с данным кодом уже существует в системе');
 
-        //__________Добавления курса обычным пользователем (доступ запрещен)__________
+        //__________Проверка на добавление курса обычным пользователем (доступ запрещен)__________
         // Авторизация
         $user = [
             'username' => 'user@yandex.ru',
@@ -291,6 +291,102 @@ class CourseControllerTest extends AbstractTest
         $client->request(
             'POST',
             $this->startingPath . '/new',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $userData['token'],
+            ],
+            $dataRequest
+        );
+        // Проверка статуса ответа (запрещено)
+        $this->assertResponseCode(Response::HTTP_FORBIDDEN, $client->getResponse());
+    }
+
+    // Тест редактирования курса
+    public function testEditCourse(): void
+    {
+        //__________Успешное редактирование курса от имени администратора__________
+        // Авторизация
+        $user = [
+            'username' => 'admin@yandex.ru',
+            'password' => 'admin123',
+        ];
+        $userData = $this->auth($user);
+
+        $client = self::getClient();
+        // Code курса который мы изменим
+        $code =  'AREND199230SKLADS';
+        // Создание запроса для редактирования курса
+        $courseDTO = new CourseDTO('EDITCOURSE1', 'rent', 3000, 'Портфель роста 2021');
+        $dataRequest = $this->serializer->serialize($courseDTO, 'json');
+        $client->request(
+            'POST',
+            $this->startingPath . '/' . $code . '/edit',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $userData['token'],
+            ],
+            $dataRequest
+        );
+        // Проверка статуса ответа
+        $this->assertResponseCode(Response::HTTP_OK, $client->getResponse());
+
+        // Проверка содержимого ответа (успешное добавление)
+        $response = json_decode($client->getResponse()->getContent(), true);
+        self::assertEquals(true, $response['success']);
+
+        //__________Неуспешное редактирование курса (замена кода курса на уже существующий в системе)__________
+        $client = self::getClient();
+        // Code курса который мы изменим
+        $code =  'AREND318305889120';
+        // Создание запроса для редактирования курса (код от курса 'Покупай/продовай на сигналах. Ленивый трейдинг')
+        $courseDTO = new CourseDTO(
+            'AREND948120385129',
+            'rent',
+            3500,
+            'Покупай/продовай на сигналах. Ленивый трейдинг'
+        );
+        $dataRequest = $this->serializer->serialize($courseDTO, 'json');
+        $client->request(
+            'POST',
+            $this->startingPath . '/' . $code . '/edit',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $userData['token'],
+            ],
+            $dataRequest
+        );
+        // Проверка статуса ответа
+        $this->assertResponseCode(Response::HTTP_METHOD_NOT_ALLOWED, $client->getResponse());
+
+        // Проверка содержимого ответа
+        $response = json_decode($client->getResponse()->getContent(), true);
+        self::assertEquals($response['message'], 'Курс с данным кодом уже существует в системе');
+
+        //__________Проверка на редоктирование курса обычным пользователем (доступ запрещен)__________
+        // Авторизация
+        $user = [
+            'username' => 'user@yandex.ru',
+            'password' => 'user123',
+        ];
+        $userData = $this->auth($user);
+
+        $client = self::getClient();
+
+        // Создание запроса для добавления нового курса
+        // Code курса который мы изменим
+        $code =  'AREND199230SKLADS';
+        // Создание запроса для редактирования курса
+        $courseDTO = new CourseDTO('EDITCOURSE1', 'rent', 3000, 'Портфель роста 2021');
+        $dataRequest = $this->serializer->serialize($courseDTO, 'json');
+        $client->request(
+            'POST',
+            $this->startingPath . '/' . $code . '/edit',
             [],
             [],
             [
