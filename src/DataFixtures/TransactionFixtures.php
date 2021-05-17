@@ -26,10 +26,18 @@ class TransactionFixtures extends Fixture
             [
                 'typeOperation' => 1,
                 'amount' => $rentCourses[0]->getPrice(),
-                'expiresAt' => new \DateTime('2021-03-17 00:00:00'),
+                'expiresAt' => new \DateTime('2021-05-08 00:00:00'),
                 'course' => $rentCourses[0],
                 'userBilling' => $user,
-                'createdAt' => new \DateTime('2021-03-10 00:00:00'),
+                'createdAt' => new \DateTime('2021-05-01 00:00:00'),
+            ],
+            [
+                'typeOperation' => 1,
+                'amount' => $rentCourses[0]->getPrice(),
+                'expiresAt' => new \DateTime('2021-05-16 00:00:00'),
+                'course' => $rentCourses[0],
+                'userBilling' => $user,
+                'createdAt' => new \DateTime('2021-05-09 00:00:00'),
             ],
             [
                 'typeOperation' => 1,
@@ -43,10 +51,10 @@ class TransactionFixtures extends Fixture
             [
                 'typeOperation' => 1,
                 'amount' => $rentCourses[2]->getPrice(),
-                'expiresAt' => (new \DateTime())->modify('+2 day'),
+                'expiresAt' => (new \DateTime())->modify('+1 day'),
                 'course' => $rentCourses[2],
                 'userBilling' => $user,
-                'createdAt' => (new \DateTime())->modify('-5 day'),
+                'createdAt' => (new \DateTime())->modify('-6 day'),
             ],
             // Купленые курсы
             [

@@ -39,28 +39,77 @@ class TransactionRepository extends ServiceEntityRepository
         $courseCode = $request->query->get('course_code');
         $skipExpired = $request->query->get('skip_expired');
 
-        $qb = $this->createQueryBuilder('t')
+        $query = $this->createQueryBuilder('t')
             ->andWhere('t.userBilling = :userId')
             ->setParameter('userId', $user->getId())
             ->orderBy('t.createdAt', 'DESC');
 
         if ($type) {
             $numberType = $types[$type];
-            $qb->andWhere('t.typeOperation = :type')
+            $query->andWhere('t.typeOperation = :type')
                 ->setParameter('type', $numberType);
         }
         if ($courseCode) {
             $course = $courseRepository->findOneBy(['code' => $courseCode]);
             $value = $course ? $course->getId() : null;
-            $qb->andWhere('t.course = :courseId')
+            $query->andWhere('t.course = :courseId')
                 ->setParameter('courseId', $value);
         }
         if ($skipExpired) {
-            $qb->andWhere('t.expiresAt is null or t.expiresAt >= :today')
+            $query->andWhere('t.expiresAt is null or t.expiresAt >= :today')
                 ->setParameter('today', new DateTime());
         }
 
-        return $qb->getQuery()->getResult();
+        return $query->getQuery()->getResult();
+    }
+
+    /**
+     * @return Transaction[]
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function findRentalEndingCourses(User $user): array
+    {
+        $connect = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT * FROM transaction t
+            INNER JOIN course c ON c.id = t.course_id
+            WHERE t.type_operation = 1 
+            AND t.user_billing_id = :user_id 
+            AND t.expires_at::date = (now()::date + '1 day'::interval)
+            ORDER BY t.created_at DESC
+            ";
+        $stmt = $connect->prepare($sql);
+        $stmt->execute([
+            'user_id' => $user->getId(),
+        ]);
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * @return Transaction[]
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function findPaidCoursesPerMonth(User $user): array
+    {
+        $connect = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT c.title, c.course_type, count(t.course_id), sum(t.amount) 
+            FROM transaction t INNER JOIN course c ON c.id = t.course_id 
+            WHERE t.type_operation = 1 AND t.user_billing_id = :user_id
+            AND (t.created_at::date between (now()::date - '1 month'::interval) AND now()::date) 
+            GROUP BY c.title, c.course_type, t.course_id
+            ";
+        $stmt = $connect->prepare($sql);
+        $stmt->execute([
+            'user_id' => $user->getId(),
+        ]);
+
+        return $stmt->fetchAllAssociative();
     }
 
     // /**
