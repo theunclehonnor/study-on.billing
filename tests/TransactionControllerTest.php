@@ -90,9 +90,9 @@ class TransactionControllerTest extends AbstractTest
             'application/json'
         ));
 
-        // Проверка содержимого ответа (6 транзакций у данного пользователя)
+        // Проверка содержимого ответа (7 транзакций у данного пользователя)
         $response = json_decode($client->getResponse()->getContent(), true);
-        self::assertCount(6, $response);
+        self::assertCount(7, $response);
 
         //________Тест с невалидным jwt token________
         $token = 'novalid';
